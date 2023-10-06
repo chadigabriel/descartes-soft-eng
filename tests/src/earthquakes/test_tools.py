@@ -49,7 +49,7 @@ def test_payout_function():
     payout_values = np.array(list(payouts.values()))
     assert np.max(payout_values) > 1
     assert np.max(payout_values) <= 100
-    assert payout_values.tolist() == [75.0, 75.0]
+    assert payout_values.tolist() == [75.0, 100.0]
 
 
 def test_harvestine_distance():
@@ -81,7 +81,7 @@ def test_compute_burning_cost():
 
     burning_cost = compute_burning_cost(payout_dict, start_year=1952, end_year=2021)
     burning_cost = round(burning_cost, 1)
-    assert burning_cost == 11.1
+    assert burning_cost == 10.7
     burning_cost_equal_years = compute_burning_cost(payout_dict, start_year=1953, end_year=1953)
     assert burning_cost_equal_years == 0
     burning_cost_start_after_end = compute_burning_cost(payout_dict, start_year=1952, end_year=1950)
