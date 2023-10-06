@@ -1,4 +1,5 @@
 from math import cos, asin, sqrt, sin, pi
+from statistics import mean
 import numpy as np
 import pandas as pd
 
@@ -86,7 +87,7 @@ def compute_payouts(earthquake_data, payout_structure):
 
     """
 
-    def compute_payout_by_event(dist, mag, payout_structure):
+    def compute_payout_by_event(event, payout_structure):
         """
         Function to compute the payout for a given event:
             the distance and magnitude of the earthquake
@@ -98,6 +99,8 @@ def compute_payouts(earthquake_data, payout_structure):
         return payout: payout amount corresponding to the event
         rtype: float
         """
+        dist = event[DISTANCE_COLUMN]
+        mag = event[MAGNITUDE_COLUMN]
         for index, row in payout_structure.iterrows():
             if dist <= row[DISTANCE_COLUMN] and mag >= row[MAGNITUDE_COLUMN]:
                 return row[PAYOUT_COLUMN]
@@ -108,15 +111,10 @@ def compute_payouts(earthquake_data, payout_structure):
     df[TIME_COLUMN] = pd.PeriodIndex(df[TIME_COLUMN], freq="Y").astype(str)
     for year, df_by_year in df.groupby(TIME_COLUMN):
         df_by_year[PAYOUT_COLUMN] = df_by_year.apply(
-            lambda x: compute_payout_by_event(x[DISTANCE_COLUMN],
-                                             x[MAGNITUDE_COLUMN],
-                                             payout_structure), axis=1)
+            lambda x: compute_payout_by_event(x, payout_structure), axis=1)
 
-        # Consider the first payout event as the payout of the year
-        # as their is only payout by year
-        df_payout_not_0 = df_by_year[PAYOUT_COLUMN].loc[df_by_year[PAYOUT_COLUMN] != 0]
-        payout_dict[int(year)] = df_payout_not_0.iloc[0] if df_payout_not_0.shape[0] else 0
-
+        # Consider the highest payout of the year
+        payout_dict[int(year)] = int(df_by_year[PAYOUT_COLUMN].max())
     return payout_dict
 
 
@@ -140,11 +138,8 @@ def compute_burning_cost(payout_dict, start_year, end_year):
     if start_year >= end_year:
         print("Start year is higher than end year => burning_cost is 0")
         return 0
+    sum_payout = sum([
+        pay for year, pay in payout_dict.items() if year >= start_year and year <= end_year])
+    burning_cost = sum_payout/(end_year - start_year + 1)
 
-    payout_df = pd.DataFrame.from_dict(payout_dict, orient="index")
-    burning_cost = (
-        payout_df[0]
-        .loc[(payout_df.index >= start_year) & (payout_df.index < end_year)]
-        .mean()
-    )
     return burning_cost
