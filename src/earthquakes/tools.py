@@ -32,9 +32,9 @@ def get_haversine_distance(latitude_col, longitude_col, latitude, longitude):
 
     """
 
-    def compute_harvestine_distance_between_two_points(pos, lat2, lon2):
+    def compute_harvesine_distance_between_two_points(pos, lat2, lon2):
         """
-        Function to compute the Harvestine distance between 2 points: (lat1, lon1) and (lat2, lon2)
+        Function to compute the Harvesine distance between 2 points: (lat1, lon1) and (lat2, lon2)
         https://en.wikipedia.org/wiki/Haversine_formula
 
         params lat1: Latitude of the first point
@@ -60,12 +60,12 @@ def get_haversine_distance(latitude_col, longitude_col, latitude, longitude):
         a = sin((lat1 - lat2) / 2) * sin((lat1 - lat2) / 2)
         b = sin((lon1 - lon2) / 2) * sin((lon1 - lon2) / 2)
         c = a + b * cos(lat1) * cos(lat2)
-        harvestine_distance = 2 * EARTH_RADIUS * asin(sqrt(c))
-        return harvestine_distance
+        harvesine_distance = 2 * EARTH_RADIUS * asin(sqrt(c))
+        return harvesine_distance
 
     df = pd.concat([latitude_col, longitude_col], axis=1)
     harvestine_distance = df.apply(
-        compute_harvestine_distance_between_two_points,
+        compute_harvesine_distance_between_two_points,
         args=(latitude, longitude),
         axis=1,
     )
